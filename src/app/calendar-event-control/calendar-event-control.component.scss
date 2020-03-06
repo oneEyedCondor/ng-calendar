@@ -1,0 +1,86 @@
+.event-control {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+    
+    .content {
+        width: 500px;
+        padding: 2em;
+        margin: 20% auto;
+        background-color: rgb(255, 255, 255);
+        border-radius: 3px;
+
+        button {
+            padding: 0.5em 1.5em;
+        }
+
+        .content-top {
+            min-height: 40px;
+            padding: 0 1em;
+            margin-top: 1em;
+            margin-bottom: 1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            // background-color: #539ee8;
+            // border: 2px solid #459bf1;
+
+            background-color: #3788d8;
+            border: 2px solid #3c91e7;
+            border-radius: 3px;
+
+            button {
+                color: rgb(255, 255, 255);
+                background-color: #3788d8;
+                border: 1px solid rgb(255, 255, 255);
+                border-radius: 3px;
+                transition: .5s;
+                
+                &:hover {
+                    background-color: #2572c0;
+                    transition: .5s;
+                }
+            }
+        }
+
+        .event {
+            width: 100%;
+            margin-bottom: 20px;
+            padding-top: 1em;
+            padding-bottom: 1em;
+            color: #9c7e7e;
+            border: 1px solid transparent;
+            border-bottom: 1px solid #3788d8;
+            transition: 2s;
+
+            .event-title {
+                text-indent: 1em;
+                margin-bottom: 0.5em;
+            }
+
+            .event-blc-controls {
+                display: flex;
+                justify-content: flex-end;
+
+                button {
+                    border: 1px solid #3788d8;
+                    border-radius: 1px;
+                    margin-left: 3px;
+                    color: #9c7e7e;
+                    transition: 0.5s;
+
+                    &:hover {
+                        border: 1px solid #2e73b8;
+                        transition: 0.5s;
+                    }
+                }
+            }
+        }
+    }
+}

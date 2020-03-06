@@ -1,0 +1,42 @@
+form {
+    .event-id {
+        color: #ff7373;
+        margin-bottom: 0.5em;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1em;
+    
+        input.form-control,
+        textarea.form-control {
+            width: 60%;
+            max-width: 95%;
+            margin: 0.5em 0;
+            padding: 0.5em;
+            color: #b49e9e;
+            border: 1px solid #ffb6b6;
+            border-radius: 3px;
+        }
+    
+        .form-alert {
+            padding: 0.5em 0;
+            color: rgb(209, 75, 75);
+            font-weight: 600;
+        }
+    }
+    
+    button {
+        padding: 0.5em 1.5em;
+        color: #9c7e7e;
+        border: 1px solid #ffb6b6;
+        transition: 0.5s;
+        border-radius: 1px;
+        margin-left: 3px;
+
+        &:hover {
+            border: 1px solid #ff7777;
+        }
+    }
+}

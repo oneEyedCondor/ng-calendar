@@ -1,0 +1,35 @@
+<div class="calendar">
+    <div class="calendar-header">
+        <h2>{{dateOfCalendar | date:'MMMM yyyy'}}</h2>
+
+        <div>
+            <button
+                [ngClass]="checkCurrentMonth()"
+                class="switch-c" 
+                (click)="resetDate()"
+            >today</button>
+            <button class="switch-l" (click)="flipCalendar($event)">&lt;</button>
+            <button class="switch-r" (click)="flipCalendar($event)">&gt;</button>
+        </div>
+    </div>
+
+    <div class="month">
+        <div class="days-of-week">
+            <p>Mon</p><p>Tue</p><p>Wed</p><p>Thu</p><p>Fri</p><p>Sat</p><p>Sun</p>
+        </div>
+        <div class="days-of-month">
+            <p [ngStyle]="offset"></p>
+            <p *ngFor="let day of month"
+                class="day"
+                [class.current-day]="isCurrentDay(day.date)"
+                (click)="showComponentEventControl(day)">
+
+                <span class="day-number">{{day.date.getDate()}}</span>
+                <span 
+                    class="day-events" 
+                    *ngIf="day.events.length"
+                >{{day.events.length}}</span>
+            </p>
+        </div>
+    </div>
+</div>
