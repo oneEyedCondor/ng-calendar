@@ -1,10 +1,9 @@
 <div class="calendar">
     <div class="calendar-header">
         <h2>{{dateOfCalendar | date:'MMMM yyyy'}}</h2>
-
         <div>
             <button
-                [ngClass]="checkCurrentMonth()"
+                [class.btn-disabled]="monthsIsMatch()"
                 class="switch-c" 
                 (click)="resetDate()"
             >today</button>
@@ -21,13 +20,13 @@
             <p [ngStyle]="offset"></p>
             <p *ngFor="let day of month"
                 class="day"
-                [class.current-day]="isCurrentDay(day.date)"
+                [class.current-day]="datesIsMatch(day.date)"
                 (click)="showComponentEventControl(day)">
 
                 <span class="day-number">{{day.date.getDate()}}</span>
                 <span 
-                    class="day-events" 
                     *ngIf="day.events.length"
+                    class="day-events" 
                 >{{day.events.length}}</span>
             </p>
         </div>

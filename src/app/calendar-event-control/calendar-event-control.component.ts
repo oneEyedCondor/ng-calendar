@@ -9,11 +9,10 @@ import { Day } from '../calendar/calendar.component';
     styleUrls: ['./calendar-event-control.component.scss']
 })
 export class CalendarEventControlComponent implements OnInit {
-    display: boolean = false;
     day: Day;
-    displayEventCreator: boolean = false;
-    displayEventEditor: boolean = false;
     chooseEvent: IEventsOfCalendar;
+    display: boolean = false;
+    displayEventCreator: boolean = false;
 
     constructor(
         private calendarService: CalendarService,
@@ -21,40 +20,31 @@ export class CalendarEventControlComponent implements OnInit {
 
     ngOnInit(): void {
         this.eventBusService.on('SelectDay', (day: Day) => {
-            this.display = true;
             this.day = day;
+            this.display = true;
         });
 
         this.eventBusService.on('CreateEvent', (newEvent: IEventsOfCalendar) => {
             this.day.events.push(newEvent);
         });
-
-        this.eventBusService.on('DeleteEvent', (id: number) => {
-            this.day.events = this.day.events.filter(event => event.id !== id);
-        });
-
+        
         this.eventBusService.on('UpdateEvent', (updatedEvent: IEventsOfCalendar) => {
-            console.log(updatedEvent);
-            // const idx = this.day.events.findIndex(event => event.id === updatedEvent.id);
-            const date1 = new Date(updatedEvent.date);
-
-            this.day.events = this.day.events.filter(event => event.id !== updatedEvent.id);
-
-            if (date1.getDate() === this.day.date.getDate() &&
-                date1.getMonth() === this.day.date.getMonth() &&
-                date1.getFullYear() === this.day.date.getFullYear() ) {
-
-                this.day.events.push(updatedEvent);
+            const match = this.datesIsMatch(new Date(updatedEvent.date), new Date(this.day.date));
+            if(match) {
+                this.day.events = this.day.events.map(
+                    event => (event.id !== updatedEvent.id)? event: updatedEvent
+                );
+            } else {
+                this.day.events = this.day.events.filter(event => event.id !== updatedEvent.id);
             }
-            
         });
     }
 
     toggleDisplay(event) {
-        if(event.target.className.includes('event-control')) {
+        if(event.target.className === 'event-control') {
             this.display = false;
             this.displayEventCreator = false;
-            this.displayEventEditor = false;
+            this.chooseEvent = null;
         }
     }
 
@@ -64,7 +54,16 @@ export class CalendarEventControlComponent implements OnInit {
     
     toggleEventEditor(event?: IEventsOfCalendar) {
         this.chooseEvent = event ? event : null;
-        this.displayEventEditor = !this.displayEventEditor;
+    }
+
+    datesIsMatch(date1, date2): boolean {
+        return (
+            date1.getDate() === date2.getDate() &&
+            date1.getMonth() === date2.getMonth() &&
+            date1.getFullYear() === date2.getFullYear()
+        ) 
+        ? true
+        : false;
     }
 
     deleteEvent(id: number): void {
@@ -72,11 +71,10 @@ export class CalendarEventControlComponent implements OnInit {
             (res: any) => {
                 if(res.message === 'OK') {
                     this.eventBusService.emit(new EventData('DeleteEvent', id));
+                    this.day.events = this.day.events.filter(event => event.id !== id);
                 }
             },
-            err => {
-                console.error(err);
-            }
+            err => console.error(err)
         );
     }
 

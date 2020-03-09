@@ -59,67 +59,59 @@ export class CalendarComponent implements OnInit {
         );
     }
 
-    addEventsToMonth() {      
+    addEventsToMonth(): void {      
         const eventsOfCurrentMonth = this.events.filter(event => 
-            this.monthsIsMatch(new Date(event.date), this.dateOfCalendar)
+            this.monthsIsMatch(new Date(event.date))
         );
         this.createMonth(eventsOfCurrentMonth);
     }
 
     createMonth(eventsOfMonth: Array<IEventsOfCalendar>): void {
         this.month = [];
-        let month = this.dateOfCalendar.getMonth();
+        const savedDate = new Date(this.dateOfCalendar);
                 
-        while(this.dateOfCalendar.getMonth() == month) {
-            const number = this.dateOfCalendar.getDate();
-
+        while(this.dateOfCalendar.getMonth() == savedDate.getMonth()) {
             let day: Day = { date: new Date(this.dateOfCalendar), events: [] };
             
             eventsOfMonth.forEach(event => {
-                if (this.monthsIsMatch(new Date(event.date), this.dateOfCalendar)
-                && new Date(event.date).getDate() === number) {
-                    
+                if(this.datesIsMatch(new Date(event.date), this.dateOfCalendar)) {
                     day.events.push(event);
                 }
             });           
             this.month.push(day);
-            this.dateOfCalendar.setDate(number+1);
+            this.dateOfCalendar.setDate(this.dateOfCalendar.getDate()+1);
         }
-        
-        this.dateOfCalendar.setMonth(month);
-
+        this.dateOfCalendar = new Date(savedDate);        
         this.setOffset();
     }
 
-    flipCalendar(event) {        
+    flipCalendar(event): void {
+        let newNumberOfMonth;
         if(event.target.textContent === '>') {
-            this.dateOfCalendar = new Date(this.dateOfCalendar.setMonth((this.dateOfCalendar.getMonth() + 1) % 12));
+            newNumberOfMonth = (this.dateOfCalendar.getMonth() + 1);
         } else {
-            this.dateOfCalendar = new Date(this.dateOfCalendar.setMonth((this.dateOfCalendar.getMonth() - 1) % 12));
+            newNumberOfMonth = (this.dateOfCalendar.getMonth() - 1);
         }
+        this.dateOfCalendar = new Date(this.dateOfCalendar.setMonth(newNumberOfMonth));
+
         this.addEventsToMonth();
     }
 
-    resetDate() {
+    resetDate(): void {
         this.dateOfCalendar = new Date();
         this.dateOfCalendar.setDate(1);
+
         this.addEventsToMonth();
     }
 
-    checkCurrentMonth() {
-        return ( this.monthsIsMatch(this.dateOfCalendar, new Date()) )
-        ? {'btn-disabled': true}
-        : {'btn-disabled': false};
-    }
-
-    dateIsMatch(date1, date2) {
+    datesIsMatch(date1, date2=new Date()): boolean {
         if(date1.getDate() === date2.getDate()) {
             return this.monthsIsMatch(date1, date2);
         }
         return false;
     }
 
-    monthsIsMatch(date1, date2) {
+    monthsIsMatch(date1=new Date(), date2=this.dateOfCalendar): boolean {
         return (
             date1.getMonth() === date2.getMonth() &&
             date1.getFullYear() === date2.getFullYear()
@@ -128,11 +120,8 @@ export class CalendarComponent implements OnInit {
         : false;
     }
 
-    setOffset() {
-        // console.log('Year: ', this.dateOfCalendar.getFullYear());
-        // console.log('Month: ', this.dateOfCalendar.getMonth());
-        const dayOfWeek = new Date(`${this.dateOfCalendar.getFullYear()} ${this.dateOfCalendar.getMonth()}`).getDay();
-        // console.log(dayOfWeek);
+    setOffset(): void {
+        const dayOfWeek = this.dateOfCalendar.getDay();
         const gridColumnEnd = dayOfWeek ? (dayOfWeek) : 7;
 
         if(gridColumnEnd !== 1) {
@@ -140,15 +129,13 @@ export class CalendarComponent implements OnInit {
                 gridColumnStart: 1,
                 gridColumnEnd
             };
+        } else {
+            this.offset = { display: 'none' };
         }
+        
     }
 
-    showComponentEventControl(day: Day) {
+    showComponentEventControl(day: Day): void {
         this.eventBusService.emit(new EventData('SelectDay', day));
     }
-
-    isCurrentDay(date) {
-        return (this.dateIsMatch(date, new Date)) ? true: false;
-    }
-
 }

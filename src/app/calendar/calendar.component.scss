@@ -81,7 +81,6 @@
         }
 
         .days-of-month {
-            min-height: 390px;
             border: 1px solid #e7e7e7;
 
             .day {
@@ -89,6 +88,12 @@
                 position: relative;
                 padding: 2em 0;
                 background-color: rgb(255, 255, 255);
+                transition: 0.3s;
+
+                &:hover {
+                    transition: 0.3s;
+                    background-color: #c6e0fa;
+                }
 
                 &-number {
                     position: absolute;

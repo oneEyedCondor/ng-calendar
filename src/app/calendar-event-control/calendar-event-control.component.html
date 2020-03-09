@@ -1,5 +1,5 @@
-<div class="event-control"
-    *ngIf="display"
+<div *ngIf="display"
+    class="event-control"
     (mousedown)="toggleDisplay($event)">
 
     <div class="content">
@@ -11,7 +11,7 @@
         </div>
 
         <div class="event" *ngFor="let evn of day.events">
-            <div *ngIf="true">
+            <div *ngIf="!(evn.id === chooseEvent?.id)">
                 <p class="event-title">{{evn.title}}</p>
                 <p class="event-blc-controls">
                     <button (click)="toggleEventEditor(evn)">Edit</button>
@@ -19,8 +19,8 @@
                 </p>
             </div>
 
-            <div class="event-creator"
-                *ngIf="(chooseEvent && (evn.id === chooseEvent.id))">
+            <div *ngIf="(evn.id === chooseEvent?.id)"
+                class="event-editor">
 
                 <app-event-form
                     [action]="'edit'"
@@ -30,8 +30,8 @@
             </div>
         </div>
 
-        <div class="event-creator"
-            *ngIf="displayEventCreator">
+        <div *ngIf="displayEventCreator"
+            class="event-creator">
 
             <h2>Creation form</h2>
             <app-event-form

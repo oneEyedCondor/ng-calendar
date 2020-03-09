@@ -13,9 +13,9 @@ export class EventFormComponent implements OnInit {
     @Input() chooseDate?: Date;
     @Input() event?: IEventsOfCalendar;
     @Output() hide = new EventEmitter();
-
+    
     eventForm: FormGroup;
-    selectedDate: string = '';
+    currentDate: string = '';
 
     constructor(
         private formBuilder: FormBuilder,
@@ -23,22 +23,24 @@ export class EventFormComponent implements OnInit {
         private eventBusService: EventBusService) { }
 
     ngOnInit() {
+        this.currentDate = this.convertDate(new Date());
         this.createEventForm();
     }
 
     createEventForm() {
         let eventName = '';
+        let eventDate = '';
 
         if(this.event) {
             eventName = this.event.title;
-            this.selectedDate = this.convertDate(this.event.date);
+            eventDate = this.convertDate(this.event.date);
         } else {
-            this.selectedDate = this.convertDate(this.chooseDate);
+            eventDate = this.convertDate(this.chooseDate);
         }
         
         this.eventForm = this.formBuilder.group({
             'eventName': [eventName, [ Validators.required ]],
-            'eventDate': [this.selectedDate],
+            'eventDate': [eventDate],
         });
     }
 
@@ -89,12 +91,14 @@ export class EventFormComponent implements OnInit {
         this.calendarService.updateEvent(updatedEvent).subscribe(
             (response: any) => {
                 if(response.message === 'OK') {
-                    this.eventBusService.emit(new EventData('UpdateEvent', updatedEvent));
+                    this.eventBusService.emit(new EventData('UpdateEvent', {
+                        id:     updatedEvent.id,
+                        title:  updatedEvent.name,
+                        date:   updatedEvent.date
+                    }));
                 }
             },
-            err => {
-                console.error(err);
-            }
+            err => console.error(err)
         );
     }
 
