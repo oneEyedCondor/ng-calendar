@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CalendarService, IEventsOfCalendar } from '../calendar.service';
 import { EventBusService, EventData } from '../event-bus.service';
+import { Subscription } from 'rxjs';
 
 export interface Day {
     date: Date;
@@ -13,11 +14,12 @@ export interface Day {
     templateUrl: './calendar.component.html',
     styleUrls: ['./calendar.component.scss']
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, OnDestroy {
     dateOfCalendar: Date;
     events: Array<IEventsOfCalendar> = [];
     month: Array<Day> = [];
     offset: any = { display: 'none' };
+    private subscription: Subscription = new Subscription();
 
     constructor(
         private calendarService: CalendarService,
@@ -30,23 +32,29 @@ export class CalendarComponent implements OnInit {
     ngOnInit(): void {
         this.getEvents()
 
-        this.eventBusService.on('CreateEvent', (newEvent: IEventsOfCalendar) => {
+        const sub1 = this.eventBusService.on('CreateEvent', (newEvent: IEventsOfCalendar) => {
             this.events.push(newEvent);
             this.addEventsToMonth();
         });
 
-        this.eventBusService.on('UpdateEvent', (updatedEvent: IEventsOfCalendar) => {
+        const sub2 = this.eventBusService.on('UpdateEvent', (updatedEvent: IEventsOfCalendar) => {
             const idx = this.events.findIndex(event => event.id === updatedEvent.id);
             if(idx !== -1) {
                 this.events[idx] = updatedEvent;
                 this.addEventsToMonth();
             }
-        })
+        });
 
-        this.eventBusService.on('DeleteEvent', (id: number) => {
+        const sub3 = this.eventBusService.on('DeleteEvent', (id: number) => {
             this.events = this.events.filter(event => event.id !== id);
             this.addEventsToMonth();
         });
+
+        this.subscription.add(sub1).add(sub2).add(sub3);
+    }
+
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 
     getEvents(): void {
@@ -132,10 +140,13 @@ export class CalendarComponent implements OnInit {
         } else {
             this.offset = { display: 'none' };
         }
-        
     }
 
     showComponentEventControl(day: Day): void {
-        this.eventBusService.emit(new EventData('SelectDay', day));
+        const dateIsMoreOrEqualCurrent = day.date > new Date() || this.datesIsMatch(day.date);
+        
+        if(dateIsMoreOrEqualCurrent || day.events.length ) {
+            this.eventBusService.emit(new EventData('SelectDay', day));
+        }
     }
 }

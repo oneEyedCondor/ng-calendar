@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CalendarService, IEventsOfCalendar } from '../calendar.service';
 import { EventBusService, EventData } from '../event-bus.service';
+import { Subscription } from 'rxjs';
 import { Day } from '../calendar/calendar.component';
 
 @Component({
@@ -8,27 +9,34 @@ import { Day } from '../calendar/calendar.component';
     templateUrl: './calendar-event-control.component.html',
     styleUrls: ['./calendar-event-control.component.scss']
 })
-export class CalendarEventControlComponent implements OnInit {
+export class CalendarEventControlComponent implements OnInit, OnDestroy {
     day: Day;
     chooseEvent: IEventsOfCalendar;
     display: boolean = false;
     displayEventCreator: boolean = false;
+    hideCreateEventBtn: boolean = true;
+    private subscription: Subscription = new Subscription();
 
     constructor(
         private calendarService: CalendarService,
         private eventBusService: EventBusService) { }
 
     ngOnInit(): void {
-        this.eventBusService.on('SelectDay', (day: Day) => {
+        const sub1 = this.eventBusService.on('SelectDay', (day: Day) => {
             this.day = day;
             this.display = true;
+            this.hideCreateEventBtn = true;
+            
+            if(day.date > new Date() || this.datesIsMatch(day.date)) {
+                this.hideCreateEventBtn = false;
+            }
         });
 
-        this.eventBusService.on('CreateEvent', (newEvent: IEventsOfCalendar) => {
+        const sub2 = this.eventBusService.on('CreateEvent', (newEvent: IEventsOfCalendar) => {
             this.day.events.push(newEvent);
         });
         
-        this.eventBusService.on('UpdateEvent', (updatedEvent: IEventsOfCalendar) => {
+        const sub3 = this.eventBusService.on('UpdateEvent', (updatedEvent: IEventsOfCalendar) => {
             const match = this.datesIsMatch(new Date(updatedEvent.date), new Date(this.day.date));
             if(match) {
                 this.day.events = this.day.events.map(
@@ -38,6 +46,12 @@ export class CalendarEventControlComponent implements OnInit {
                 this.day.events = this.day.events.filter(event => event.id !== updatedEvent.id);
             }
         });
+
+        this.subscription.add(sub1).add(sub2).add(sub3);
+    }
+    
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
     }
 
     toggleDisplay(event) {
@@ -56,7 +70,7 @@ export class CalendarEventControlComponent implements OnInit {
         this.chooseEvent = event ? event : null;
     }
 
-    datesIsMatch(date1, date2): boolean {
+    datesIsMatch(date1, date2=new Date()): boolean {
         return (
             date1.getDate() === date2.getDate() &&
             date1.getMonth() === date2.getMonth() &&

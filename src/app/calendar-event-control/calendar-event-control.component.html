@@ -5,7 +5,7 @@
     <div class="content">
         <div class="content-top">{{day.date | date}}
             <button 
-                *ngIf="!displayEventCreator" 
+                *ngIf="!displayEventCreator && !hideCreateEventBtn" 
                 (click)="toggleEventCreator()"
             >Create event</button>
         </div>

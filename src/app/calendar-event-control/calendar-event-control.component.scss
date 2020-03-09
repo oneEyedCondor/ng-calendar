@@ -28,9 +28,6 @@
             justify-content: space-between;
             align-items: center;
             color: #fff;
-            // background-color: #539ee8;
-            // border: 2px solid #459bf1;
-
             background-color: #3788d8;
             border: 2px solid #3c91e7;
             border-radius: 3px;
@@ -80,6 +77,15 @@
                         transition: 0.5s;
                     }
                 }
+            }
+        }
+
+        .event-creator {
+            h2 {
+                text-align: center;
+                font-size: 0.8rem;
+                color: #3788d8;
+                text-transform: uppercase;
             }
         }
     }
